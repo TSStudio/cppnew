@@ -1,5 +1,6 @@
 #include<cstdio>
 #include<cmath>
+#include<algorithm>
 
 #pragma GCC optimize(3)
 #pragma GCC target("avx,sse2,sse3,sse4,mmx")
@@ -50,15 +51,25 @@
 #pragma GCC optimize("-fdelete-null-pointer-checks")
 
 double amount[50];
+
+void returnnum(unsigned long long x){
+    for(int i=0;i<38;i++){
+        if(!((x>>i)&1))
+            printf("%.2lf+",amount[i]);
+    }
+    printf("\b\n");
+}
 int main(){
-    freopen("1.out","w",stdout);
+    double total=37475711.40;
+    //freopen("1.out","w",stdout);
     unsigned long long n;
     double targ,epis;
     unsigned long long status=0;
     unsigned long long max=0,count=0;
     scanf("%d%lf%lf",&n,&targ,&epis);
-    max=(1LL<<(n-2));//+(1LL<<(n-2));
+    max=1LL<<(n);//+(1LL<<(n-2));
     for(int i=0;i<n;i++)scanf("%lf",&amount[i]);
+    std::sort(amount,amount+n);
     printf("N:%d,MAX:%llu\n",n,max);
     for(status=1;status<max;status++,count++){
         if(count%10000000==0){
@@ -70,20 +81,21 @@ int main(){
                 sum+=amount[i];
             }
         }
-        if(sum>targ+epis){
-            printf("OVERSIZE,OPTIMIZING,CURRENT:%llu\n",status);
+        if(total-sum<targ-epis){
+            //printf("OVERSIZE,OPTIMIZING,CURRENT:%.2lf(%llu)\n",sum,status);
             for(int i=n+1;i>=0;i--){
                 if((status>>i)&1){
                     status=1LL<<(i+1);
-                    printf("OPTIMIZED TO:%llu\n",status);
+                    //printf("OPTIMIZED TO:%llu\n",status);
                     break;
                 }
             }
             continue;
         }
         //printf("RESULT : %.2lf\n",sum);
-        if(fabs(sum-targ)<=epis){
-            printf("POSSIBLE FOUND. %llu RESULT : %.2lf\n",status,sum);
+        if(fabs(total-sum-targ)<=epis){
+            returnnum(status);
+            printf("POSSIBLE FOUND. %llu RESULT : %.2lf, EPIS:%.2lf\n",status,total-sum,total-sum-targ);
         }
     }
 }
